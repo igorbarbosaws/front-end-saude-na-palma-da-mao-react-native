@@ -1,4 +1,5 @@
 import { useColorScheme } from "react-native";
+import { useAcessibilidade } from "./core/acessibilidade.js";
 
 // Identidade TriaOrto+ (mesmos valores de css/base.css do front-end web).
 // O público inclui pessoas idosas: fonte grande, bom contraste, alvos de toque de 48 px.
@@ -50,6 +51,22 @@ export const ALVO_MINIMO = 48;
 export const fonte = { corpo: 17, pequena: 14, titulo: 26, subtitulo: 20 };
 
 // Uso: const c = useTema();  ->  c.primaria, c.texto, ...
+// Com "contraste alto" ligado, o texto e as bordas ficam no máximo contraste.
 export function useTema() {
-  return useColorScheme() === "dark" ? escuro : claro;
+  const { contraste } = useAcessibilidade();
+  const base = useColorScheme() === "dark" ? escuro : claro;
+  if (!contraste) return base;
+  const dark = base === escuro;
+  return {
+    ...base,
+    texto: dark ? "#ffffff" : "#000000",
+    textoSuave: dark ? "#e0e0e0" : "#1a1a1a",
+    borda: dark ? "#ffffff" : "#000000",
+    primaria: dark ? "#7fe8d2" : "#075a50",
+  };
+}
+
+// Multiplicador de tamanho de fonte (1, 1.15, 1.3) escolhido em Perfil > Acessibilidade.
+export function useEscala() {
+  return useAcessibilidade().escala;
 }
