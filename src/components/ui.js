@@ -5,7 +5,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
-import { ALVO_MINIMO, espaco, fonte, raio, useTema } from "../theme.js";
+import { ALVO_MINIMO, espaco, fonte, raio, useEscala, useTema } from "../theme.js";
 import { ouvir } from "../core/events.js";
 
 // Tela com área segura, rolagem e teclado que não cobre os campos.
@@ -29,17 +29,20 @@ export function Tela({ children, rolar = true, style, contentStyle }) {
 
 export function Titulo({ children, style }) {
   const c = useTema();
-  return <Text accessibilityRole="header" style={[{ fontSize: fonte.titulo, fontWeight: "700", color: c.texto, marginBottom: espaco.p }, style]}>{children}</Text>;
+  const e = useEscala();
+  return <Text accessibilityRole="header" style={[{ fontSize: fonte.titulo * e, fontWeight: "700", color: c.texto, marginBottom: espaco.p }, style]}>{children}</Text>;
 }
 
 export function Texto({ children, suave, style, ...resto }) {
   const c = useTema();
-  return <Text style={[{ fontSize: fonte.corpo, color: suave ? c.textoSuave : c.texto, lineHeight: 26 }, style]} {...resto}>{children}</Text>;
+  const e = useEscala();
+  return <Text style={[{ fontSize: fonte.corpo * e, color: suave ? c.textoSuave : c.texto, lineHeight: 26 * e }, style]} {...resto}>{children}</Text>;
 }
 
 // variante: "cheio" (padrão) | "contorno" | "perigo"
 export function Botao({ titulo, onPress, variante = "cheio", ocupado = false, desabilitado = false, style }) {
   const c = useTema();
+  const e = useEscala();
   const off = desabilitado || ocupado;
   const cores = {
     cheio: { bg: off ? c.desabilitado : c.primaria, fg: off ? c.desabilitadoTexto : c.sobrePrimaria, borda: "transparent" },
@@ -61,17 +64,18 @@ export function Botao({ titulo, onPress, variante = "cheio", ocupado = false, de
       ]}
     >
       {ocupado && <ActivityIndicator color={cores.fg} style={{ marginRight: 8 }} />}
-      <Text style={{ color: cores.fg, fontSize: fonte.corpo, fontWeight: "700" }}>{titulo}</Text>
+      <Text style={{ color: cores.fg, fontSize: fonte.corpo * e, fontWeight: "700" }}>{titulo}</Text>
     </Pressable>
   );
 }
 
 export function Campo({ rotulo, erro, style, inputStyle, ...resto }) {
   const c = useTema();
+  const e = useEscala();
   const [foco, setFoco] = useState(false);
   return (
     <View style={[{ marginBottom: espaco.m }, style]}>
-      <Text style={{ fontSize: fonte.pequena + 1, fontWeight: "600", color: c.texto, marginBottom: 6 }}>{rotulo}</Text>
+      <Text style={{ fontSize: (fonte.pequena + 1) * e, fontWeight: "600", color: c.texto, marginBottom: 6 }}>{rotulo}</Text>
       <TextInput
         accessibilityLabel={rotulo}
         placeholderTextColor={c.textoSuave}
@@ -79,7 +83,7 @@ export function Campo({ rotulo, erro, style, inputStyle, ...resto }) {
         onBlur={() => setFoco(false)}
         style={[
           {
-            minHeight: ALVO_MINIMO + 4, borderRadius: raio, borderWidth: 1.5, paddingHorizontal: espaco.m, fontSize: fonte.corpo,
+            minHeight: ALVO_MINIMO + 4, borderRadius: raio, borderWidth: 1.5, paddingHorizontal: espaco.m, fontSize: fonte.corpo * e,
             color: c.texto, backgroundColor: c.superficie, borderColor: erro ? c.erro : foco ? c.primaria : c.borda,
           },
           inputStyle,
