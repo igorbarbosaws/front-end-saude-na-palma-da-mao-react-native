@@ -2,15 +2,13 @@
 //
 //  - login: troca e-mail + senha por { token, usuario }. O token vai na sessão e é enviado em toda chamada (core/http.js).
 //  - cadastro: cria o usuário como PACIENTE e, em seguida, o registro de paciente (CPF, nascimento, sexo).
-//  - "Entrar com CPF" continua funcionando: o CPF é trocado pelo e-mail do paciente antes de chamar o login.
+//  - O login é só por e-mail e senha (o back-end não aceita CPF em /auth/login).
 //
 // A senha é conferida e guardada (com hash) só pelo servidor; o app nunca a guarda.
 import { http, ApiError } from "../core/http.js";
 import { sessao } from "../core/session.js";
-import { pacienteApi } from "./usuarioService.js";
 
-const apenasDigitos = (s) => String(s ?? "").replace(/\D/g, "");
-const FALHA_LOGIN = "E-mail, CPF ou senha incorretos.";
+const FALHA_LOGIN = "E-mail ou senha incorretos.";
 
 // Descobre o id de paciente/profissional do usuário que acabou de entrar. Usa só rotas liberadas para qualquer usuário logado.
 async function completarDados(dados, token) {
@@ -35,21 +33,12 @@ async function completarDados(dados, token) {
 }
 
 export const authService = {
-  // "identificador" pode ser e-mail ou CPF (com ou sem pontuação). CPF só existe para pacientes.
   async login(identificador, senha, { lembrar = true } = {}) {
-    const entrada = String(identificador ?? "").trim();
-    let email = entrada;
-
-    if (!entrada.includes("@")) {
-      const cpf = apenasDigitos(entrada);
-      const pacientes = cpf.length === 11 ? await pacienteApi.listar() : [];
-      email = pacientes.find((x) => apenasDigitos(x.cpf) === cpf)?.usuario?.email;
-      if (!email) throw new ApiError(FALHA_LOGIN, 401);
-    }
+    const email = String(identificador ?? "").trim().toLowerCase();
 
     let resposta;
     try {
-      resposta = await http("/auth/login", { method: "POST", body: { email: email.toLowerCase(), senha }, autenticar: false });
+      resposta = await http("/auth/login", { method: "POST", body: { email, senha }, autenticar: false });
     } catch (erro) {
       if (erro.status === 400 || erro.status === 401) throw new ApiError(FALHA_LOGIN, 401);
       throw erro;
