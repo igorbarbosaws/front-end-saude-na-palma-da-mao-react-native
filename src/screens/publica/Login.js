@@ -1,4 +1,4 @@
-// Login por e-mail ou CPF. O perfil escolhido na tela anterior restringe quem pode entrar.
+// Login por e-mail e senha. O perfil escolhido na tela anterior restringe quem pode entrar.
 import { useState } from "react";
 import { Pressable, Switch, Text, View } from "react-native";
 import { Alerta, AvisoLento, BarraTopo, Botao, Campo, Texto, Titulo, Tela } from "../../components/ui.js";
@@ -20,7 +20,7 @@ export default function Login({ navigation, route }) {
   async function entrar() {
     setErro("");
     if (!identificador.trim() || !senha) {
-      setErro("Informe seu e-mail ou CPF e a senha.");
+      setErro("Informe seu e-mail e a senha.");
       return;
     }
     setOcupado(true);
@@ -45,12 +45,12 @@ export default function Login({ navigation, route }) {
     <Tela>
       <BarraTopo titulo="Voltar" onVoltar={() => navigation.goBack()} />
       <Titulo>Entrar{perfil ? ` como ${perfil.nome}` : ""}</Titulo>
-      <Texto suave style={{ marginBottom: espaco.g }}>Use seu e-mail ou CPF e sua senha.</Texto>
+      <Texto suave style={{ marginBottom: espaco.g }}>Use seu e-mail e sua senha.</Texto>
 
       <AvisoLento />
       {!!aviso && <Alerta tipo="aviso">{aviso}</Alerta>}
 
-      <Campo rotulo="E-mail ou CPF" value={identificador} onChangeText={setIdentificador} placeholder="seuemail@exemplo.com"
+      <Campo rotulo="E-mail" value={identificador} onChangeText={setIdentificador} placeholder="seuemail@exemplo.com"
         autoCapitalize="none" autoCorrect={false} keyboardType="email-address" textContentType="username" autoComplete="username" />
       <Campo rotulo="Senha" value={senha} onChangeText={setSenha} placeholder="Senha" secureTextEntry autoCapitalize="none"
         textContentType="password" autoComplete="password" onSubmitEditing={entrar} />
